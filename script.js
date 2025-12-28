@@ -1,5 +1,14 @@
 let openedDoors = {};
 
+async function getDayContent(day) {
+  try {
+    const module = await import(`./days/day${day}.js`);
+    return module.dayContent;
+  } catch {
+    return "Yllätys puuttuu!";
+  }
+}
+
 function loadOpenedDoors() {
   const saved = localStorage.getItem('openedDoors_xmas');
   if(saved) openedDoors = JSON.parse(saved);
@@ -31,21 +40,20 @@ function createCalendar() {
       door.onclick = ()=> alert(`Tämä luukku avautuu vasta ${i}. joulukuuta!`);
     } else {
       if(isOpened) door.classList.add('opened');
-      door.onclick = ()=> openDoor(i);
+      door.onclick = async ()=> {
+        const content = await getDayContent(i);
+        openDoor(i, content);
+      };
     }
 
     calendar.appendChild(door);
   }
 }
 
-function openDoor(day){
-  fetch(`days/day${day}.html`)
-    .then(res => res.text())
-    .then(content => {
-      document.getElementById('window-title').textContent = `Luukku ${day}`;
-      document.getElementById('window-content').innerHTML = content;
-      document.getElementById('door-window').style.display = 'block';
-    });
+function openDoor(day, content){
+  document.getElementById('window-title').textContent = `Luukku ${day}`;
+  document.getElementById('window-content').innerHTML = content;
+  document.getElementById('door-window').style.display = 'block';
 
   openedDoors[day] = true;
   saveOpenedDoors();
@@ -60,4 +68,3 @@ document.getElementById('window-close').onclick = ()=> {
 
 loadOpenedDoors();
 createCalendar();
-
