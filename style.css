@@ -40,43 +40,58 @@ h1 {
 }
 
 .calendar-grid {
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:20px;
-  margin-bottom:40px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
 .door {
-  width:100px;
-  height:100px;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* forces perfect square for circle */
+  max-width: 100px;     /* max size */
   background: #C0392B;  /* Cozy red */
-  border-radius:50%; /* make circular */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:1.8em;
-  font-weight:bold;
-  cursor:pointer;
+  border-radius: 50%;    /* circular shape */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8em;
+  font-weight: bold;
+  cursor: pointer;
   transition: all 0.3s ease;
-  border:3px solid rgba(255,255,255,0.3);
-  box-shadow:0 4px 15px rgba(0,0,0,0.2);
+  border: 3px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .door.opened {
-  background:#F1C40F; /* Cozy gold */
-  color:#000;
+  background: #F1C40F; /* Cozy gold */
+  color: #000;
 }
 
 .door.locked {
-  background:#8E44AD; /* Deep purple accent */
-  cursor:not-allowed;
-  opacity:0.7;
+  background: #8E44AD; /* Deep purple accent */
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .door:hover:not(.locked) {
   transform: scale(1.1);
-  box-shadow:0 6px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
 }
+
+@media(max-width:1024px){
+  .calendar-grid{ grid-template-columns:repeat(4,1fr); }
+  .door{ max-width: 80px; font-size:1.6em; }
+}
+@media(max-width:768px){
+  .calendar-grid{ grid-template-columns:repeat(3,1fr); gap:15px; }
+  .door{ max-width: 80px; font-size:1.6em; }
+}
+@media(max-width:480px){
+  .calendar-grid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+  .door{ max-width: 60px; font-size:1.3em; }
+}
+
 
 .door-window {
   display:none;
