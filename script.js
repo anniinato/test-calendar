@@ -2,8 +2,9 @@ let openedDoors = {};
 
 async function getDayContent(day) {
   try {
-    const module = await import(`./days/day${day}.js`);
-    return module.dayContent;
+    const response = await fetch(`./days/day${day}.html`);
+    if (!response.ok) throw new Error("Day file not found");
+    return await response.text();
   } catch {
     return "Yllätys puuttuu!";
   }
@@ -11,7 +12,7 @@ async function getDayContent(day) {
 
 function loadOpenedDoors() {
   const saved = localStorage.getItem('openedDoors_xmas');
-  if(saved) openedDoors = JSON.parse(saved);
+  if (saved) openedDoors = JSON.parse(saved);
 }
 
 function saveOpenedDoors() {
@@ -23,24 +24,24 @@ function createCalendar() {
   calendar.innerHTML = '';
 
   const now = new Date();
-  const fiTime = new Date(now.toLocaleString("en-US",{timeZone:"Europe/Helsinki"}));
+  const fiTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Helsinki" }));
   const currentDay = fiTime.getDate();
-  const currentMonth = fiTime.getMonth()+1;
+  const currentMonth = fiTime.getMonth() + 1;
 
-  for(let i=1;i<=24;i++){
+  for (let i = 1; i <= 24; i++) {
     const door = document.createElement('div');
-    door.className='door';
-    door.textContent=i;
+    door.className = 'door';
+    door.textContent = i;
 
-    const isOpened = openedDoors[i]===true;
-    const canOpen = (currentMonth===12 && i<=currentDay) || currentMonth>12 || isOpened;
+    const isOpened = openedDoors[i] === true;
+    const canOpen = (currentMonth === 12 && i <= currentDay) || currentMonth > 12 || isOpened;
 
-    if(!canOpen){
+    if (!canOpen) {
       door.classList.add('locked');
-      door.onclick = ()=> alert(`Tämä luukku avautuu vasta ${i}. joulukuuta!`);
+      door.onclick = () => alert(`Tämä luukku avautuu vasta ${i}. joulukuuta!`);
     } else {
-      if(isOpened) door.classList.add('opened');
-      door.onclick = async ()=> {
+      if (isOpened) door.classList.add('opened');
+      door.onclick = async () => {
         const content = await getDayContent(i);
         openDoor(i, content);
       };
@@ -50,7 +51,7 @@ function createCalendar() {
   }
 }
 
-function openDoor(day, content){
+function openDoor(day, content) {
   document.getElementById('window-title').textContent = `Luukku ${day}`;
   document.getElementById('window-content').innerHTML = content;
   document.getElementById('door-window').style.display = 'block';
@@ -59,11 +60,11 @@ function openDoor(day, content){
   saveOpenedDoors();
 
   const doorElements = document.querySelectorAll('.door');
-  if(doorElements[day-1]) doorElements[day-1].classList.add('opened');
+  if (doorElements[day - 1]) doorElements[day - 1].classList.add('opened');
 }
 
-document.getElementById('window-close').onclick = ()=> {
-  document.getElementById('door-window').style.display='none';
+document.getElementById('window-close').onclick = () => {
+  document.getElementById('door-window').style.display = 'none';
 }
 
 loadOpenedDoors();
