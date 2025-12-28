@@ -1,0 +1,42 @@
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f2f2f2;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #b30000;
+  color: white;
+  padding: 20px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.door {
+  background-color: #ff0000;
+  color: white;
+  font-size: 1.5em;
+  padding: 20px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.door:hover:not(.locked) {
+  transform: scale(1.1);
+  background-color: #ff6666;
+}
+
+.door.locked {
+  background-color: #888;
+  cursor: not-allowed;
+}
