@@ -1,20 +1,21 @@
 const calendar = document.getElementById("calendar");
 const doorContent = document.getElementById("door-content");
+const doorTitle = document.getElementById("door-title");
 const doorText = document.getElementById("door-text");
 const closeButton = document.getElementById("close-button");
 
-// Finnish timezone offset: UTC+2 (or UTC+3 in DST)
+// Finnish time calculation
 function getFinnishDate() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  // Finland is UTC+2, +3 if DST
-  return new Date(utc + 2 * 3600000); 
+  // Finland is UTC+2 (UTC+3 if daylight saving, but December is UTC+2)
+  return new Date(utc + 2 * 3600000);
 }
 
-// This year's December
-const year = new Date().getFullYear();
+const todayDate = getFinnishDate();
+const year = todayDate.getFullYear();
 const month = 11; // December
-const today = getFinnishDate().getDate();
+const today = todayDate.getDate();
 
 // Surprises for each day
 const surprises = {
@@ -44,18 +45,21 @@ const surprises = {
   24: "🎉 Hyvää joulua! 🎄"
 };
 
-// Generate calendar doors
+// Generate doors
 for (let day = 1; day <= 24; day++) {
   const door = document.createElement("div");
   door.className = "door";
   door.textContent = day;
 
+  // Only allow opening for today or past
   if (day > today) {
     door.classList.add("locked");
   } else {
     door.addEventListener("click", () => {
+      doorTitle.textContent = `Luukku ${day}`;
       doorText.textContent = surprises[day] || "🎄 Hauskaa joulua!";
       doorContent.style.display = "block";
+      doorContent.scrollIntoView({ behavior: "smooth" });
     });
   }
 
