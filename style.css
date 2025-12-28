@@ -20,14 +20,22 @@ header {
   margin: 20px auto;
 }
 
+/* Hexagonal cookie-cutter shape */
 .door {
+  width: 80px;
+  height: 70px;
   background-color: #ff0000;
   color: white;
-  font-size: 1.5em;
-  padding: 20px 0;
-  border-radius: 8px;
+  font-size: 1.2em;
   cursor: pointer;
   user-select: none;
+  position: relative;
+  clip-path: polygon(
+    25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.2s, background-color 0.2s;
 }
 
@@ -39,4 +47,23 @@ header {
 .door.locked {
   background-color: #888;
   cursor: not-allowed;
+}
+
+/* Door content below calendar */
+.door-content {
+  display: none;
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 15px;
+  text-align: center;
+}
+
+#close-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
