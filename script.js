@@ -1,72 +1,63 @@
-const calendar = document.getElementById("calendar");
-const doorContent = document.getElementById("door-content");
-const doorTitle = document.getElementById("door-title");
-const doorText = document.getElementById("door-text");
-const closeButton = document.getElementById("close-button");
+let openedDoors = {};
 
-// Finnish time calculation
-function getFinnishDate() {
+function loadOpenedDoors() {
+  const saved = localStorage.getItem('openedDoors_xmas');
+  if(saved) openedDoors = JSON.parse(saved);
+}
+
+function saveOpenedDoors() {
+  localStorage.setItem('openedDoors_xmas', JSON.stringify(openedDoors));
+}
+
+function createCalendar() {
+  const calendar = document.getElementById('calendar');
+  calendar.innerHTML = '';
+
   const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  // Finland is UTC+2 (UTC+3 if daylight saving, but December is UTC+2)
-  return new Date(utc + 2 * 3600000);
-}
+  const fiTime = new Date(now.toLocaleString("en-US",{timeZone:"Europe/Helsinki"}));
+  const currentDay = fiTime.getDate();
+  const currentMonth = fiTime.getMonth()+1;
 
-const todayDate = getFinnishDate();
-const year = todayDate.getFullYear();
-const month = 11; // December
-const today = todayDate.getDate();
+  for(let i=1;i<=24;i++){
+    const door = document.createElement('div');
+    door.className='door';
+    door.textContent=i;
 
-// Surprises for each day
-const surprises = {
-  1: "🎅 Hei! Ensimmäinen luukku on auki!",
-  2: "🍫 Suklaata päivän herkuksi!",
-  3: "🎵 Kuuntele joululaulu!",
-  4: "❄️ Ulkona sataa lunta!",
-  5: "🎁 Pieni yllätys odottaa!",
-  6: "🕯 Sytytä adventtikynttilä!",
-  7: "☕ Nauti kuuma kaakao!",
-  8: "🎄 Koristele joulukuusi!",
-  9: "🎨 Piirrä joulukortti!",
-  10: "🍪 Leivo pipareita!",
-  11: "🎶 Laula joululauluja!",
-  12: "🧦 Valmistele joulusukat!",
-  13: "🖼 Katso jouluelokuva!",
-  14: "📝 Kirjoita joulutervehdys!",
-  15: "🍎 Tee jouluomenahillo!",
-  16: "🎁 Tee lahjalista!",
-  17: "❄️ Lähde ulos lumileikkeihin!",
-  18: "📖 Lue joulutarina!",
-  19: "🎵 Soita joulusävel!",
-  20: "🕯 Järjestä kynttilävalaistus!",
-  21: "🎄 Tee joulukoristeita!",
-  22: "🍫 Valmista joulusuklaat!",
-  23: "🎁 Pakkaa lahjat!",
-  24: "🎉 Hyvää joulua! 🎄"
-};
+    const isOpened = openedDoors[i]===true;
+    const canOpen = (currentMonth===12 && i<=currentDay) || currentMonth>12 || isOpened;
 
-// Generate doors
-for (let day = 1; day <= 24; day++) {
-  const door = document.createElement("div");
-  door.className = "door";
-  door.textContent = day;
+    if(!canOpen){
+      door.classList.add('locked');
+      door.onclick = ()=> alert(`Tämä luukku avautuu vasta ${i}. joulukuuta!`);
+    } else {
+      if(isOpened) door.classList.add('opened');
+      door.onclick = ()=> openDoor(i);
+    }
 
-  // Only allow opening for today or past
-  if (day > today) {
-    door.classList.add("locked");
-  } else {
-    door.addEventListener("click", () => {
-      doorTitle.textContent = `Luukku ${day}`;
-      doorText.textContent = surprises[day] || "🎄 Hauskaa joulua!";
-      doorContent.style.display = "block";
-      doorContent.scrollIntoView({ behavior: "smooth" });
-    });
+    calendar.appendChild(door);
   }
-
-  calendar.appendChild(door);
 }
 
-// Close button
-closeButton.addEventListener("click", () => {
-  doorContent.style.display = "none";
-});
+function openDoor(day){
+  fetch(`days/day${day}.html`)
+    .then(res => res.text())
+    .then(content => {
+      document.getElementById('window-title').textContent = `Luukku ${day}`;
+      document.getElementById('window-content').innerHTML = content;
+      document.getElementById('door-window').style.display = 'block';
+    });
+
+  openedDoors[day] = true;
+  saveOpenedDoors();
+
+  const doorElements = document.querySelectorAll('.door');
+  if(doorElements[day-1]) doorElements[day-1].classList.add('opened');
+}
+
+document.getElementById('window-close').onclick = ()=> {
+  document.getElementById('door-window').style.display='none';
+}
+
+loadOpenedDoors();
+createCalendar();
+
